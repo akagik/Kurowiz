@@ -14,7 +14,7 @@ from kivy.uix.boxlayout import BoxLayout
 import threading
 import kmouse
 from time import sleep
-from mainloop import mainloop
+from mainloop import MainLoop
 from kscreen import captureCurrentWindow
 
 
@@ -28,9 +28,10 @@ class LoopRunning(threading.Thread):
         self.join()
 
     def run(self):
+        loop = MainLoop()
         kmouse.activate()
         while(not self.stop_event.is_set()):
-            mainloop()
+            loop.loop()
 
 
 class MainWidget(BoxLayout):

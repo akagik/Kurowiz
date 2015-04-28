@@ -79,7 +79,7 @@ def match_rgb(f1, f2):
 #   ・extf imageを引数として, その特徴量を返す関数
 #   ・scan_box 走査範囲. ない場合はrec_boxと同じ値が使われる
 #   ・rec_box このカテゴリーを判別する矩形領域
-#   ・preprocess imageを引数として, その前処理をした画像を返す関数
+#   ・preprocess imageを引数として, その前処理をした画像を返す関数, なければ何もしない
 def recognize(input_image, match, threshold, dictionary):
     category_key = None
     category_max_sim = -1
@@ -94,7 +94,11 @@ def recognize(input_image, match, threshold, dictionary):
 
         rec_width = rec_box[2] - rec_box[0]
         rec_height = rec_box[3] - rec_box[1]
-        prep_image = value["preprocess"](input_image)
+
+        if "preprocess" in value:
+            prep_image = value["preprocess"](input_image)
+        else:
+            prep_image = input_image
         
         max_sim = -1
         for x in range(scan_box[0], scan_box[2] - rec_width + 1):

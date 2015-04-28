@@ -78,3 +78,11 @@ def captureCurrentWindow():
     image = getCurrentImage()
     image.save('temp/current_window.png')
 
+def get_normalized_image(image):
+    # returns the normalized image.
+    if(ASPECT_RATIO[0] != 1.0 and ASPECT_RATIO[1] != 1.0):
+        image = image.resize((
+            int(image.size[0] / ASPECT_RATIO[0]),
+            int(image.size[1] / ASPECT_RATIO[1])
+            ))
+    return image

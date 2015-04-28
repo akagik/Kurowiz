@@ -6,6 +6,7 @@ from defines import ROOT_DIR
 import recog
 from kscreen import getCurrentImage
 from kscreen import ASPECT_RATIO
+from kscreen import get_normalized_image
 
 IS_GENRE_IMG_PATH = ROOT_DIR + "/res/is_genre.png"
 IS_QUES_IMG_PATH = ROOT_DIR + "/res/is_question.png"
@@ -166,14 +167,6 @@ scene_color_dictionary["subque_compelete"] = {
 #    image = imagetool.crop(rec_box, image)
 #    return image
 
-def get_normalized_image(image):
-    # returns the normalized image.
-    if(ASPECT_RATIO[0] != 1.0 and ASPECT_RATIO[1] != 1.0):
-        image = image.resize((
-            int(image.size[0] / ASPECT_RATIO[0]),
-            int(image.size[1] / ASPECT_RATIO[1])
-            ))
-    return image
 
 def judge_scene(image = None):
     # クエスト時における現在の状態を判別する

@@ -16,6 +16,7 @@ from ktext import calc_sim_text
 
 from kques import QUESES
 from kques import show_question
+import time
 
 GENRE = [
         u"理系",
@@ -151,17 +152,18 @@ def get_genre(image):
     genre, gsim = recog_genre(image)
     return genre
 
-def get_ques(image, genre):
+def get_ques(image, genre, panel = None):
     chars, imgs = to_chars(image, cut_char_zenkaku)
     slen = len(chars)
-    queses = get_questions_where(genre, None, (slen - 2, slen + 2))
+
+    queses = get_questions_where(genre, panel, (slen - 2, slen + 2))
     q, sim = recog_question(chars, queses)
 
     qcontent = kchar.list_to_str_unicode(chars)
     return q,sim,qcontent
 
-def recog_test(num):
-    path = "temp/{0}.png".format(num)
+def recog_test(num, panel=None):
+    path = "temp/ques/{0}.png".format(num)
     if(not os.path.exists(path)):
         return
     print path
@@ -175,9 +177,13 @@ def recog_test(num):
     print chars
 
     slen = len(chars)
-    queses = get_questions_where(genre, None, (slen - 2, slen + 2))
+    queses = get_questions_where(genre, panel, (slen - 2, slen + 2))
 
+    stime = time.clock()
     q, sim = recog_question(chars, queses)
+    etime = time.clock()
+    print etime - stime, "s"
+
     print q["question"]
     print sim
     print "{0} == {1}?".format(len(chars), len(q["question"]))
@@ -198,4 +204,5 @@ def recog_test(num):
         print "Select:", choice_index+1
 
 
-#recog_test(1639)
+#recog_test(566, u"1色")
+#recog_test(566)
