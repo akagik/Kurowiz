@@ -127,7 +127,7 @@ def get_choices(image):
                 CHOICE_CH_SIZE,
                 rgb_to_barray_near_black_reverse
                 )
-        printUnicodeChars(cchars)
+        print(cchars)
         choices.append(cchars)
     return choices
 
@@ -157,7 +157,7 @@ def get_ques(image, genre):
     queses = get_questions_where(genre, None, (slen - 2, slen + 2))
     q, sim = recog_question(chars, queses)
 
-    qcontent = kchars.list_to_str_unicode(chars)
+    qcontent = kchar.list_to_str_unicode(chars)
     return q,sim,qcontent
 
 def recog_test(num):

@@ -2,12 +2,16 @@
 import kdebug
 import time
 
+from klogger import logger
 from recog_scene import judge_scene
 from recog_scene import judge_ansnum
 from recog_scene import judge_erratum
 
 from kmouse import clickAt
+
 from kscreen import getCurrentImage
+from kscreen import SELECT_GENRE_POS
+from kscreen import SELECT_ANSWER_POS
 
 from recog_ques import get_genre
 from recog_ques import get_choices
@@ -18,7 +22,7 @@ def mainloop():
     scene_key = judge_scene()
     if(scene_key == "is_genre"):
         print("genre select")
-        clickAt(select_genre_pos[random.randint(0,3)])
+        clickAt(SELECT_GENRE_POS[random.randint(0,3)])
     elif(scene_key == "is_question"):
         print("question select")
         image = getCurrentImage()
@@ -31,7 +35,7 @@ def mainloop():
         print q["question"]
         print "qsim:", qsim
         if(qsim < 0.3):
-            clickAt(select_answer_pos[random.randint(0, 3)])
+            clickAt(SELECT_ANSWER_POS[random.randint(0, 3)])
             time.sleep(1)
             ansnum = judge_ansnum()
             if(ansnum != -1):
@@ -52,7 +56,7 @@ def mainloop():
             else:
                 logger.debug("Known question!!!")
 
-            clickAt(select_answer_pos[choice])
+            clickAt(SELECT_ANSWER_POS[choice])
             time.sleep(1)
 
             erratum_key = judge_erratum()
