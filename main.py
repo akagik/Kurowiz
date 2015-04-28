@@ -15,6 +15,7 @@ import threading
 import kmouse
 from time import sleep
 from mainloop import mainloop
+from kscreen import captureCurrentWindow
 
 
 class LoopRunning(threading.Thread):
@@ -37,11 +38,19 @@ class MainWidget(BoxLayout):
     def __init__(self, **kwargs):
         super(MainWidget, self).__init__(**kwargs)
         self.loop_button = Button(text="start")
+        self.screenshot_button = Button(text="screenshot")
+
         self.add_widget(self.loop_button)
+        self.add_widget(self.screenshot_button)
+
         self.is_running = False
         self.loop_tread = None
 
         self.loop_button.bind(on_press=self.toggle_loop)
+        self.screenshot_button.bind(on_press=self.do_screenshot)
+    
+    def do_screenshot(self, *args, **kwargs):
+        captureCurrentWindow()
 
     def toggle_loop(self, *args, **kwargs):
         self.is_running = not self.is_running
