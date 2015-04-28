@@ -17,6 +17,7 @@ from recog_ques import get_genre
 from recog_ques import get_choices
 from recog_ques import get_ques
 from recog_ques import get_answer
+import random
 
 def mainloop():
     scene_key = judge_scene()
