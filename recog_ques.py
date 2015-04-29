@@ -176,7 +176,7 @@ def get_genre(image):
 def get_ques(image, genre, panel = None):
     chars, imgs, sims = to_chars_question(image)
     slen = len(chars)
-    logger.debug(u"recog content:" + chars)
+    print u"recog content:" + chars
     
     candidates = []
     for i in range(5):
@@ -188,7 +188,7 @@ def get_ques(image, genre, panel = None):
 
     logger.debug("candidates:")
     for v in candidates:
-        logger.debug(u"\t{0}: {1}".format(v["index"], v["value"]))
+        print u"\t{0}: {1}".format(v["index"], v["value"])
 
     stime = time.clock()
     queses = get_questions_where(genre, panel, (slen - 2, slen + 2), candidates)
@@ -242,5 +242,5 @@ def recog_test(num, panel=None):
             print "Select:", choice_index+1
 
 
-#recog_test(1488, u"1色")
+recog_test(1488, u"1色")
 #recog_test(566)
