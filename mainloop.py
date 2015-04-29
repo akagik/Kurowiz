@@ -37,8 +37,17 @@ class MainLoop():
             # for debug
             for i, v in enumerate(panels):
                 logger.debug("{0}: panel_size:{1}, color:{2}".format(i, v[0], v[1]))
+            
+            # 色が一番多いパネルを選択
+            max_size = -1
+            max_num = -1
+            for i, v in enumerate(panels):
+                if(v[0] > max_size):
+                    max_size = v[0]
+                    max_num = i
 
-            click_panel_num = random.randint(0,3)
+#            click_panel_num = random.randint(0,3)
+            click_panel_num = max_num
             clickAt(SELECT_GENRE_POS[click_panel_num])
             self.select_panel = panels[click_panel_num]
 
