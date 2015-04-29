@@ -186,19 +186,19 @@ def get_ques(image, genre, panel = None):
                 "value": chars[i]
                 })
 
-    logger.debug("candidates:")
+    print "candidates:"
     for v in candidates:
         print u"\t{0}: {1}".format(v["index"], v["value"])
 
     stime = time.clock()
     queses = get_questions_where(genre, panel, (slen - 2, slen + 2), candidates)
     etime = time.clock()
-    logger.debug("問題検索にかかった時間 {0} s".format(etime - stime))
+    print "問題検索にかかった時間 {0} s".format(etime - stime)
 
     stime = time.clock()
     q, sim = recog_question(chars, queses)
     etime = time.clock()
-    logger.debug("問題認識にかかった時間 {0} s".format(etime - stime))
+    print "問題認識にかかった時間 {0} s".format(etime - stime)
 
     qcontent = kchar.list_to_str_unicode(chars)
     return q,sim,qcontent
