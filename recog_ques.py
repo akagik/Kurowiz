@@ -27,7 +27,18 @@ GENRE = [
         u"アニメ＆ゲーム",
         ]
 
-def get_questions_where(genre, panel=None, lrange=None):
+def get_questions_where(
+        genre,
+        panel=None,
+        lrange=None,
+        candidates=None):
+    # 条件に合致する問題を返す.
+    # @param genre ジャンル. 理系, 文系など.
+    # @param panel パネルの色の数. 1色, 2色, 3色.
+    # @param lrange 問題文の長さ. (2, 4)のように指定する.
+    # @param candidates 文字の候補.
+    #       @key index 文字のインデックス
+    #       @key value ユニコード文字
     ret = []
     for value in QUESES:
         if(value["type"] != 0):
@@ -39,6 +50,16 @@ def get_questions_where(genre, panel=None, lrange=None):
         if(lrange != None):
             if(len(value["question"]) < lrange[0]
                 or len(value["question"]) > lrange[1]):
+                continue
+        if(candidates != None and len(candidates) > 0):
+            size = 0
+            for v in candidates:
+                if(len(value["question"]) <= v["index"]):
+                    continue
+                if(value["question"][v["index"]] != v["value"]):
+                    continue
+                size += 1
+            if(float(size) / len(candidates) < 0.5):
                 continue
         ret.append(value)
     return ret
@@ -153,11 +174,31 @@ def get_genre(image):
     return genre
 
 def get_ques(image, genre, panel = None):
-    chars, imgs = to_chars(image, cut_char_zenkaku)
+    chars, imgs, sims = to_chars_question(image)
     slen = len(chars)
+    logger.debug(u"recog content:" + chars)
+    
+    candidates = []
+    for i in range(5):
+        if(sims[i] > 0.8):
+            candidates.append({
+                "index": i,
+                "value": chars[i]
+                })
 
-    queses = get_questions_where(genre, panel, (slen - 2, slen + 2))
+    logger.debug("candidates:")
+    for v in candidates:
+        logger.debug(u"\t{0}: {1}".format(v["index"], v["value"]))
+
+    stime = time.clock()
+    queses = get_questions_where(genre, panel, (slen - 2, slen + 2), candidates)
+    etime = time.clock()
+    logger.debug("問題検索にかかった時間 {0} s".format(etime - stime))
+
+    stime = time.clock()
     q, sim = recog_question(chars, queses)
+    etime = time.clock()
+    logger.debug("問題認識にかかった時間 {0} s".format(etime - stime))
 
     qcontent = kchar.list_to_str_unicode(chars)
     return q,sim,qcontent
@@ -177,32 +218,29 @@ def recog_test(num, panel=None):
     print chars
 
     slen = len(chars)
-    queses = get_questions_where(genre, panel, (slen - 2, slen + 2))
+    q, sim, qcontent = get_ques(image, genre, panel)
 
-    stime = time.clock()
-    q, sim = recog_question(chars, queses)
-    etime = time.clock()
-    print etime - stime, "s"
-
-    print q["question"]
     print sim
-    print "{0} == {1}?".format(len(chars), len(q["question"]))
-    if(sim > 0.5):
-        choices = []
-        for i in range(4):
-            cchars, cimgs = to_chars(
-                    image,
-                    cut_char_zenkaku,
-                    CHOICE_BOXES[i],
-                    CHOICE_CH_SIZE,
-                    rgb_to_barray_near_black_reverse
-                    )
-            print(cchars)
-            choices.append(cchars)
-        choice_index, csim = recog_choice(choices, q)
-        print "Answer:", q["answer"]
-        print "Select:", choice_index+1
+
+    if(q != None):
+        print "{0} == {1}?".format(len(chars), len(q["question"]))
+        print q["question"]
+        if(sim > 0.5):
+            choices = []
+            for i in range(4):
+                cchars, cimgs = to_chars(
+                        image,
+                        cut_char_zenkaku,
+                        CHOICE_BOXES[i],
+                        CHOICE_CH_SIZE,
+                        rgb_to_barray_near_black_reverse
+                        )
+                print(cchars)
+                choices.append(cchars)
+            choice_index, csim = recog_choice(choices, q)
+            print "Answer:", q["answer"]
+            print "Select:", choice_index+1
 
 
-#recog_test(566, u"1色")
+#recog_test(1488, u"1色")
 #recog_test(566)

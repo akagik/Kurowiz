@@ -65,7 +65,9 @@ class MainLoop():
                     panel = None 
             q, qsim, qcontent = get_ques(image, genre, panel)
             
-            logger.debug(q["question"])
+            if(q!=None):
+                logger.debug(q["question"])
+
             print "qsim:", qsim
             if(qsim < 0.3):
                 clickAt(SELECT_ANSWER_POS[random.randint(0, 3)])

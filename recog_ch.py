@@ -175,7 +175,24 @@ def to_char(image):
         if(sim > max_sim):
             max_sim = sim
             max_key = key
-    return max_key
+    return max_key, max_sim
+
+
+# 問題文の文字を認識する
+def to_chars_question(image):
+    gimages = screen_to_boximg(image, CONTENT_BOXES, rgb_to_barray_near_white)
+    chars = []
+    imgs = []
+    sims = []
+
+    for img in gimages:
+        imgs += cut_char_zenkaku(img, CH_SIZE)
+
+    for img in imgs:
+        ch, sim = to_char(img)
+        chars.append(ch)
+        sims.append(sim)
+    return kchar.list_to_str_unicode(chars), imgs, sims
 
 def to_chars(
         image,
@@ -196,7 +213,8 @@ def to_chars(
         imgs += cut_method(gimages, SIZE)
 
     for img in imgs:
-        chars.append(to_char(img))
+        ch, sim = to_char(img)
+        chars.append(ch)
     return kchar.list_to_str_unicode(chars), imgs
 
 
