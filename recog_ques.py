@@ -142,13 +142,14 @@ def get_choices(image):
 
     choices = []
     for i in range(4):
-        cchars, cimgs = to_chars(
-                image,
-                cut_char_zenkaku,
-                CHOICE_BOXES[i],
-                CHOICE_CH_SIZE,
-                rgb_to_barray_near_black_reverse
-                )
+        cchars, cimgs, sims = to_chars_choice(image, i)
+#        cchars, cimgs = to_chars(
+#                image,
+#                cut_char_zenkaku,
+#                CHOICE_BOXES[i],
+#                CHOICE_CH_SIZE,
+#                rgb_to_barray_near_black_reverse
+#                )
         print(cchars)
         choices.append(cchars)
     return choices
@@ -225,22 +226,12 @@ def recog_test(num, panel=None):
     if(q != None):
         print "{0} == {1}?".format(len(chars), len(q["question"]))
         print q["question"]
-        if(sim > 0.5):
-            choices = []
-            for i in range(4):
-                cchars, cimgs = to_chars(
-                        image,
-                        cut_char_zenkaku,
-                        CHOICE_BOXES[i],
-                        CHOICE_CH_SIZE,
-                        rgb_to_barray_near_black_reverse
-                        )
-                print(cchars)
-                choices.append(cchars)
-            choice_index, csim = recog_choice(choices, q)
-            print "Answer:", q["answer"]
-            print "Select:", choice_index+1
+
+        choices = get_choices(image)
+        choice_index, csim = recog_choice(choices, q)
+        print "Answer:", q["answer"]
+        print "Select:", choice_index+1
 
 
-recog_test(1488, u"1色")
+#recog_test(566, u"1色")
 #recog_test(566)

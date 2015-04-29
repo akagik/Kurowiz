@@ -50,6 +50,182 @@ def next_white_i(image, start):
             return i
     return -1
 
+def cut_and_recog_char(image, SIZE=CH_SIZE):
+    # 切り出しと同時に文字認識を行う.
+    # 候補文字から最大の文字を選択することで半角、全角を認識できる.
+    # SIZEは使わない
+
+    def cut_horizontally(h_range):
+        # d のピクセルは含めるが
+        # u のピクセルは含めるない
+        u = -1 
+        d = 0
+        is_white_prev = False
+
+        for j in range(image.size[1]-1):
+            if(u == -1):
+                # 横ラインが白ならばupperをjにする
+                if(not is_hline_range(image, j, 0, h_range)):
+                    u = j
+                    is_white_prev = True
+            else:
+                if(is_hline_range(image, j, 0, h_range)):
+                    # 前回が白のときだけdownを更新する
+                    if(is_white_prev):
+                        d = j
+                    is_white_prev = False
+                else:
+                    is_white_prev = True
+        if(not is_hline_range(image, j + 1, 0, h_range)):
+            d = j + 1
+        return d, u
+
+    def get_max_sim_index(candidates):
+        max_sim = -1000
+        max_i = -1
+        for i, c in enumerate(candidates):
+            if(c["sim"] > max_sim):
+                max_sim = c["sim"]
+                max_i = i
+        return max_i
+
+    def get_candidate(l, r, now_l):
+        d, u = cut_horizontally((l, r))
+        ch_image = image.crop([l, u, r, d])
+        ch_dir = kchar.get_ch_dir_where((r-l, d-u), 4)
+        ch, sim = to_char(ch_image, ch_dir)
+
+        # for debug
+#        print "get candidate:"
+#        print "\tleft donw:", (l, d)
+#        print "\tsize:", (r-l, d-u)
+#        print u"\tch: ", ch if ch != None else ""
+#        print
+        
+        return {"value": ch, "sim": sim, "img": ch_image, "left": now_l}
+
+    # 縦方向の切り出し
+    l = -1 
+    i = 0
+
+    # 文字候補
+    candidates = []
+
+    # 結果
+    ret_imgs = []
+    ret_chars = u""
+    sims = []
+
+    while(i < image.size[0]):
+        if(l == -1):
+            # 縦ラインが白ならばleftをiにする
+            if(not is_vline(image, i, 0)):
+                l = i
+        else:
+            # 縦ラインが黒(背景)ならcutする
+            if(is_vline(image, i, 0)):
+                r = i
+
+                if(len(candidates) == 0):
+                    candidates.append(get_candidate(l, r, l))
+                else:
+                    width = r - candidates[0]["left"]
+
+                    # width が23以上になった場合は、そこまでの候補文字から
+                    # 類似度が最も高い候補文字を選択する
+                    if(width >= 23):
+#                        print("width >= 23")
+                        max_i = get_max_sim_index(candidates)
+
+                        c = candidates[max_i]
+                        if(c["value"] == None):
+                            ret_chars += u"　"
+#                            print u"append ret:'{0}'".format(u"　")
+                        else:
+                            ret_chars += c["value"]
+#                            print u"append ret:'{0}'".format(c["value"])
+                        sims.append(c["sim"])
+                        ret_imgs.append(c["img"])
+
+                        if(len(candidates) == max_i + 1):
+                            candidates = []
+                            candidates.append(get_candidate(l, r, l))
+                        else:
+                            i = candidates[max_i + 1]["left"] - 1
+                            candidates = []
+#                            candidates.append(get_candidate(candidates[0]["left"], r, l))
+                    else:
+                        candidates.append(get_candidate(candidates[0]["left"], r, l))
+                l = -1 
+        i += 1
+
+#    print "check candidate"
+    while(len(candidates) > 0):
+#        print len(candidates)
+        
+        max_i = get_max_sim_index(candidates)
+#        print max_i
+        c = candidates[max_i]
+        if(c["value"] == None):
+            ret_chars += u"　"
+#            print u"append ret:'{0}'".format(u"　")
+        else:
+            ret_chars += c["value"]
+#            print u"append ret:'{0}'".format(c["value"])
+        sims.append(c["sim"])
+        ret_imgs.append(c["img"])
+        candidates = candidates[max_i+1:]
+
+    return ret_chars, ret_imgs, sims
+
+def cut_char_all(image, SIZE=CH_SIZE):
+    ret = []
+    
+    def cut_horizontally(h_range):
+        # d のピクセルは含めるが
+        # u のピクセルは含めるない
+        u = -1 
+        d = 0
+        is_white_prev = False
+
+        for j in range(image.size[1]-1):
+            if(u == -1):
+                # 横ラインが白ならばupperをjにする
+                if(not is_hline_range(image, j, 0, h_range)):
+                    u = j
+                    is_white_prev = True
+            else:
+                if(is_hline_range(image, j, 0, h_range)):
+                    # 前回が白のときだけdownを更新する
+                    if(is_white_prev):
+                        d = j
+                    is_white_prev = False
+                else:
+                    is_white_prev = True
+        if(not is_hline_range(image, j + 1, 0, h_range)):
+            d = j + 1
+        return d, u
+
+    # 縦方向の切り出し
+    l = -1 
+    r = 0
+    m = 0
+    i = 0
+    while(i < image.size[0]):
+        if(l == -1):
+            # 縦ラインが白ならばleftをiにする
+            if(not is_vline(image, i, 0)):
+                l = i
+        else:
+            # 縦ラインが黒(背景)ならcutする
+            if(is_vline(image, i, 0)):
+                r = i
+                d, u = cut_horizontally((l, r))
+                ret.append(image.crop([l, u, r, d]))
+                l = -1 
+        i += 1
+    return ret
+
 def cut_char_zenkaku(image, SIZE=CH_SIZE):
     ret = []
 
@@ -163,14 +339,14 @@ def screen_to_boximg(image, boxes, rgb_to_barray):
     return barray_to_gimage(barray, image_content.size)
 
 
-def to_char(image):
+def to_char(image, ch_dir = kchar.CH_DIR):
     image = image.resize((CH_SIZE,CH_SIZE))
     barray1 = g_to_barray(image.getdata())
 
     max_sim = -1
     max_key = None
 
-    for key, value in kchar.items_all():
+    for key, value in ch_dir.items():
         sim = calc_sim_b(barray1, value)
         if(sim > max_sim):
             max_sim = sim
@@ -181,18 +357,29 @@ def to_char(image):
 # 問題文の文字を認識する
 def to_chars_question(image):
     gimages = screen_to_boximg(image, CONTENT_BOXES, rgb_to_barray_near_white)
-    chars = []
+    chars = u""
     imgs = []
     sims = []
 
     for img in gimages:
-        imgs += cut_char_zenkaku(img, CH_SIZE)
+        chars2, imgs2, sims2 = cut_and_recog_char(img, CH_SIZE)
+        chars += chars2
+        imgs += imgs2
+        sims += sims2
 
-    for img in imgs:
-        ch, sim = to_char(img)
-        chars.append(ch)
-        sims.append(sim)
-    return kchar.list_to_str_unicode(chars), imgs, sims
+    return chars, imgs, sims
+
+def to_chars_choice(image, i):
+    img = screen_to_boximg(image, CHOICE_BOXES[i], rgb_to_barray_near_black_reverse)
+    chars = u""
+    imgs = []
+    sims = []
+
+    chars2, imgs2, sims2 = cut_and_recog_char(img, CHOICE_CH_SIZE)
+    chars += chars2
+    imgs += imgs2
+    sims += sims2
+    return chars, imgs, sims
 
 def to_chars(
         image,
@@ -220,10 +407,16 @@ def to_chars(
 
 # running code ----------------------------------------------
 
-#image = Image.open("1639.png")
-#image.show()
-#string, imgs = to_chars(
-#        image,
-#        cut_char_zenkaku
-#        )
-#print string
+#image = Image.open("temp/ques/1680.png")
+#img = screen_to_boximg(image, CHOICE_BOX2, rgb_to_barray_near_black_reverse)
+#chars, imgs, sims = to_chars_question(image)
+#chars, imgs, sims = to_chars_choice(image, 3)
+#image = screen_to_boximg(image, CONTENT_BOX, rgb_to_barray_near_white)
+
+#image = screen_to_boximg(image, CONTENT_BOX_2, rgb_to_barray_near_white)
+#chars, imgs, sims = cut_and_recog_char(image)
+
+#print chars
+#print sims
+#for i, im in enumerate(ch_imgs):
+#    im.save("temp/temp_char/{0}.png".format(i))

@@ -8,7 +8,9 @@ else:
     ROOT_DIR = "/Users/kohei/Project/Kurowiz"
 
 CH_SIM_TABLE_PATH = ROOT_DIR + "/tools/ch_sim_dir.dat"
-CHAR_IMG_PATH = ROOT_DIR + "/tools/all"
+#CHAR_IMG_PATH = ROOT_DIR + "/res/chars/zenkaku"
+#CHAR_IMG_PATH = ROOT_DIR + "/res/chars/hankaku"
+CHAR_IMG_PATH = ROOT_DIR + "/res/chars/all"
 GENRE_CHAR_IMG_PATH = ROOT_DIR + "/tools/genre"
 QUES_PATH = ROOT_DIR + "/questions"
 

@@ -65,6 +65,7 @@ def crop_box_left_down(box, image):
             int(box[2]),
             int(iheight - box[1])
             )
+#    print "crop box:", box2
     return image.crop(box2)
 
 def calc_sim_b(bdata1, bdata2):
@@ -89,9 +90,21 @@ def is_vline(image, i, color):
             return False
     return True
 
+def is_vline_range(image, i, color, ran):
+    for j in range(ran[0], ran[1]):
+        if(image.getpixel((i, j)) != color):
+            return False
+    return True
+
 def is_hline(image, j, color):
     # returns True if the value of pixel at the row j line of the image is the color.
     for i in range(image.size[0]):
+        if(image.getpixel((i, j)) != color):
+            return False
+    return True
+
+def is_hline_range(image, j, color, ran):
+    for i in range(ran[0], ran[1]):
         if(image.getpixel((i, j)) != color):
             return False
     return True
