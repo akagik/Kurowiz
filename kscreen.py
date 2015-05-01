@@ -2,6 +2,7 @@
 #execfile('/home/kohei/.pystartup')
 
 import sys
+from defines import ROOT_DIR
 from klogger import logger
 from PIL import Image
 import os
@@ -20,6 +21,8 @@ SELECT_GENRE_POS.append((330, 90))
 
 # ゲームウィンドウの左下の点
 WINDOW_ORIGIN = (480, 769) # origin position
+
+
 #window_origin = (480, 780)
 #window_origin = (946, 769)
 
@@ -34,11 +37,26 @@ WINDOW_RIGHTTOP = (
         WINDOW_ORIGIN[1] - WINDOW_HEIGHT
         )
 
-
 ASPECT_RATIO = (
         float(WINDOW_WIDTH) / ORIGINAL_WINDOW_SIZE[0],
         float(WINDOW_HEIGHT) / ORIGINAL_WINDOW_SIZE[1]
         )
+
+# multi window
+WINDOW_ORIGINS = [
+        (480, 769),
+        (979, 769)
+        ]
+
+def change_window(i):
+    global WINDOW_ORIGIN, WINDOW_RIGHTTOP
+    print "change window:", i
+
+    WINDOW_ORIGIN = WINDOW_ORIGINS[i]
+    WINDOW_RIGHTTOP = (
+            WINDOW_ORIGIN[0] + WINDOW_WIDTH,
+            WINDOW_ORIGIN[1] - WINDOW_HEIGHT
+            )
 
 
 
@@ -68,6 +86,12 @@ def getCurrentImage():
     
     return image
 
+def change_next_window():
+    os.system('osascript {0}/change_window.scpt'.format(ROOT_DIR))
+
+def change_next_next_window():
+    os.system('osascript {0}/change_window2.scpt'.format(ROOT_DIR))
+
 def showCurrentWindow():
     # show the current window.
     image = getCurrentImage()
@@ -86,3 +110,5 @@ def get_normalized_image(image):
             int(image.size[1] / ASPECT_RATIO[1])
             ))
     return image
+
+

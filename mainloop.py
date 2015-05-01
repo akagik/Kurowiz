@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 import kdebug
 import time
-from PIL import Image
+import random
 
 from klogger import logger
 from recog_scene import judge_scene
@@ -20,7 +20,6 @@ from recog_ques import get_ques
 from recog_ques import get_answer
 
 from recog_panel import judge_panels
-import random
 
 class MainLoop():
     def __init__(self):
@@ -34,20 +33,20 @@ class MainLoop():
             logger.debug("genre select")
             panels = judge_panels(default_image)
 
-            # for debug
-            for i, v in enumerate(panels):
-                logger.debug("{0}: panel_size:{1}, color:{2}".format(i, v[0], v[1]))
-            
-            # 色が一番多いパネルを選択
+            # 色が青・赤、または色が一番多いパネルを選択
             max_size = -1
             max_num = -1
             for i, v in enumerate(panels):
+                # If color is red, select it.
+                if(v[1][0] == 1 or v[1][0] == 0):
+                    click_panel_num = i
+                    break
                 if(v[0] > max_size):
                     max_size = v[0]
                     max_num = i
+            if(click_panel_num == -1):
+                click_panel_num = max_num
 
-#            click_panel_num = random.randint(0,3)
-            click_panel_num = max_num
             clickAt(SELECT_GENRE_POS[click_panel_num])
             self.select_panel = panels[click_panel_num]
 
@@ -58,7 +57,7 @@ class MainLoop():
             image = getCurrentImage()
             genre = get_genre(image)
             choices = get_choices(image)
-            time.sleep(2.3)
+            time.sleep(2.2)
 
             image = getCurrentImage()
 
@@ -86,14 +85,9 @@ class MainLoop():
                     print "answer nubmer:", ansnum
                 else:
                     print "answer number:", "読み取り不能"
-                save_q = {}
-                save_q["genre"] = genre
-                save_q["question"] = qcontent
-                save_q["answer"] = choices[ansnum-1]
 
-    #            QUESTIONS.append(save_q)
-    #            kfile.dump_data([save_q], "questions/question_{0}.dat".format(qcontent.encode("utf-8")))
             else:
+                print "answer:", q["answer"]
                 choice = get_answer(image, q, choices)
                 if(choice == -1):
                     logger.debug("Unknown question...")
@@ -110,7 +104,8 @@ class MainLoop():
                     print("不正解...")
                 else:
                     print("判別不能")
-        time.sleep(2)
+        time.sleep(0.5)
 
+#from PIL import Image
 #image = Image.open("temp/genre/genre3.png")
 #MainLoop().loop(image)

@@ -1,15 +1,16 @@
 # -*- encoding: utf-8 -*-
 import kdebug
 from pymouse import PyMouse
-from kscreen import *
+from kscreen import WINDOW_ORIGIN
+from kscreen import ASPECT_RATIO
 
 m = PyMouse()
 
 def get_rel_pos(abs_pos):
     # returns the relative position to window.
     # @param abs_pos the absolute position.
-    x = int(abs_pos[0] - window_origin[0]) 
-    y = int(-abs_pos[1] + window_origin[1])
+    x = int(abs_pos[0] - WINDOW_ORIGIN[0])
+    y = int(-abs_pos[1] + WINDOW_ORIGIN[1])
     return (x, y)
 
 def get_abs_pos(rel_pos):

@@ -180,7 +180,7 @@ def get_ques(image, genre, panel = None):
     print u"recog content:" + chars
     
     candidates = []
-    for i in range(5):
+    for i in range(min(5, len(chars))):
         if(sims[i] > 0.8):
             candidates.append({
                 "index": i,

@@ -33,13 +33,13 @@ dictionary_scene["is_question"] = {
         "extf": recog.extf_of_is_question,
         "preprocess": lambda x: barray_to_gimage(g_to_barray(rgb_to_garray_average(x.getdata())), x.size)
         }
-dictionary_scene["is_stage_select"] = {
-        "rec_box": (27, 187, 39, 200),
-        "scan_box": getSurroundBox((27, 187, 39, 200), 1),
-        "feature": g_to_barray(Image.open(IS_STAGE_SELECT_IMG_PATH).getdata()),
-        "extf": lambda x: g_to_barray(x.getdata()),
-        "preprocess": lambda x: barray_to_gimage(g_to_barray(rgb_to_garray_average(x.getdata())), x.size)
-        }
+#dictionary_scene["is_stage_select"] = {
+#        "rec_box": (27, 187, 39, 200),
+#        "scan_box": getSurroundBox((27, 187, 39, 200), 1),
+#        "feature": g_to_barray(Image.open(IS_STAGE_SELECT_IMG_PATH).getdata()),
+#        "extf": lambda x: g_to_barray(x.getdata()),
+#        "preprocess": lambda x: barray_to_gimage(g_to_barray(rgb_to_garray_average(x.getdata())), x.size)
+#        }
 
 
 # 正誤の判別に利用する辞書
@@ -175,10 +175,10 @@ def judge_scene(image = None):
         image = getCurrentImage()
         image = get_normalized_image(image)
 
-    key = recog.recognize(
+    key, sim = recog.recognize(
             input_image = image,
             match = calc_sim_b,
-            threshold = 0.8,
+            threshold = 0.75,
             dictionary = dictionary_scene
             )
     return key
@@ -189,7 +189,7 @@ def judge_erratum(image = None):
         image = getCurrentImage()
         image = get_normalized_image(image)
 
-    key = recog.recognize(
+    key, sim = recog.recognize(
             image,
             recog.match_answer_erratum,
             0.0,
@@ -203,7 +203,7 @@ def judge_ansnum(image = None):
         image = getCurrentImage()
         image = get_normalized_image(image)
 
-    key = recog.recognize(
+    key, sim = recog.recognize(
             image,
             recog.match_rgb,
             0.0,
@@ -226,7 +226,7 @@ def judge_scene_color(image = None):
         image = getCurrentImage()
         image = get_normalized_image(image)
 
-    key = recog.recognize(
+    key, sim = recog.recognize(
             image,
             recog.match_rgb,
             0.92,

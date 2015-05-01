@@ -120,10 +120,9 @@ def recognize(input_image, match, threshold, dictionary):
         if(max_sim > category_max_sim):
             category_max_sim = max_sim
             category_key = key
-        print 
-        logger.debug("{0} -> sim: {1}".format(key, max_sim))
+#        logger.debug("{0} -> sim: {1}".format(key, max_sim))
 
     if(category_max_sim < threshold):
-        return None
+        return None, -1
 
-    return category_key
+    return category_key, max_sim
